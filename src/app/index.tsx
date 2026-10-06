@@ -1,8 +1,27 @@
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlashCardSet, flashcardsets } from "@/data/flashcardset";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 // This is the home screen (route "/").
 export default function Index() {
+  return (
+    <FlatList
+      data={flashcardsets}
+      keyExtractor={(f) => f.id}
+      renderItem={({ item }) => <FlashcardRow flashcardsets={item} />}
+      ListHeaderComponent={<Header />}
+      contentContainerStyle={styles.list}
+    />
+  );
+}
+
+function Header() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -10,33 +29,44 @@ export default function Index() {
       </Text>
 
       <View style={styles.row}>
-        <TextInput placeholder="Search flashcard library" />
+        <TextInput
+          style={styles.input}
+          placeholder="Search flashcard library"
+        />
 
-        <Pressable onPress={() => console.log("Search")}>
-          <Text>Search</Text>\
+        <Pressable style={styles.button} onPress={() => console.log("Search")}>
+          <Text>Search</Text>
         </Pressable>
       </View>
-
-      <Text></Text>
     </View>
   );
 }
 
-function Header() {
-  const [query, setQuery] = useState<string>("");
+function FlashcardRow({ flashcardsets }: { flashcardsets: FlashCardSet }) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardMain}>
+        <Text style={styles.cardTitle}>{flashcardsets.name}</Text>
+        <Text style={styles.cardSub}>{flashcardsets.subject}</Text>
+      </View>
 
-  return <View></View>;
-}
-
-function FlashCardSetRow() {
-  return <View></View>;
+      <Text style={styles.cardSub}></Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  list: { padding: 16, gap: 8 },
-  card: { padding: 12, borderRadius: 8 },
+  list: {
+    padding: 16,
+    gap: 8,
+  },
+  card: {
+    padding: 12,
+    borderRadius: 8,
+  },
   cardMain: {},
   cardTitle: {},
+  cardSub: {},
   container: {
     flex: 1,
     alignItems: "center",
