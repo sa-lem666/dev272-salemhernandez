@@ -1,24 +1,42 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 // This is the home screen (route "/").
-// Week 1: change the two lines marked 👇, run the app, commit, push.
 export default function Index() {
-  // 👇 Week 1: replace with your name
-  const studentName = "Salem Hernandez";
-  // 👇 Week 1: replace with something you want to build this quarter
-  const appIdea = "Flash card app";
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>DEV 272 · Mobile Application Development</Text>
-      <Text style={styles.body}>Hello, I am {studentName}.</Text>
-      <Text style={styles.body}>This quarter I want to build {appIdea}.</Text>
-      <Text style={styles.hint}>Edit src/app/index.tsx to change this screen.</Text>
+      <Text style={styles.title}>
+        Hello, welcome to your flashcard library!
+      </Text>
+
+      <View style={styles.row}>
+        <TextInput placeholder="Search flashcard library" />
+
+        <Pressable onPress={() => console.log("Search")}>
+          <Text>Search</Text>\
+        </Pressable>
+      </View>
+
+      <Text></Text>
     </View>
   );
 }
 
+function Header() {
+  const [query, setQuery] = useState<string>("");
+
+  return <View></View>;
+}
+
+function FlashCardSetRow() {
+  return <View></View>;
+}
+
 const styles = StyleSheet.create({
+  list: { padding: 16, gap: 8 },
+  card: { padding: 12, borderRadius: 8 },
+  cardMain: {},
+  cardTitle: {},
   container: {
     flex: 1,
     alignItems: "center",
@@ -41,4 +59,11 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     textAlign: "center",
   },
+  row: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  input: {},
+  button: {},
 });
