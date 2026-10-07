@@ -1,4 +1,5 @@
 import { FlashCardSet, flashcardsets } from "@/data/flashcardset";
+import { useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -22,6 +23,8 @@ export default function Index() {
 }
 
 function Header() {
+  const [query, setQuery] = useState<string>("");
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -32,6 +35,10 @@ function Header() {
         <TextInput
           style={styles.input}
           placeholder="Search flashcard library"
+          value={query}
+          onChangeText={setQuery}
+          autoCapitalize="none"
+          returnKeyType="search"
         />
 
         <Pressable style={styles.button} onPress={() => console.log("Search")}>
