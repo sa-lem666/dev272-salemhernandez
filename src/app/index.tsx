@@ -6,58 +6,82 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   View,
 } from "react-native";
+import { colors, Palette } from "./constants/colors";
 
 // This is the home screen (route "/").
 export default function Index() {
+  const c = colors[useColorScheme() === "dark" ? "dark" : "light"];
+
   return (
     <FlatList
       data={flashcardsets}
       keyExtractor={(f) => f.id}
-      renderItem={({ item }) => <FlashcardRow flashcardsets={item} />}
-      ListHeaderComponent={<Header />}
+      renderItem={({ item }) => <FlashcardRow flashcardsets={item} c={c} />}
+      ListHeaderComponent={<Header c={c} />}
       contentContainerStyle={styles.list}
     />
   );
 }
 
-function Header() {
+function Header({ c }: { c: Palette }) {
   const [query, setQuery] = useState<string>("");
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Hello, welcome to your flashcard library!
+      <Text style={[styles.title, { color: c.text }]}>
+        Hello, Welcome To Your Flashcard Library!
       </Text>
 
       <View style={styles.row}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: c.border, color: c.text }]}
           placeholder="Search flashcard library"
+          placeholderTextColor={c.muted}
           value={query}
           onChangeText={setQuery}
           autoCapitalize="none"
           returnKeyType="search"
         />
 
-        <Pressable style={styles.button} onPress={() => console.log("Search")}>
-          <Text>Search</Text>
+        <Pressable
+          style={[styles.button, { backgroundColor: c.primary }]}
+          onPress={() => console.log("Search:", query)} //Terminal should show the search action and what was searched
+        >
+          <Text style={styles.buttonText}>Search</Text>
         </Pressable>
       </View>
+      <Text style={{ color: c.muted }}>{query.length} characters</Text>
     </View>
   );
 }
 
-function FlashcardRow({ flashcardsets }: { flashcardsets: FlashCardSet }) {
+function FlashcardRow({
+  flashcardsets,
+  c,
+}: {
+  flashcardsets: FlashCardSet;
+  c: Palette;
+}) {
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: c.card, borderColor: c.cardBorder },
+      ]}
+    >
       <View style={styles.cardMain}>
-        <Text style={styles.cardTitle}>{flashcardsets.name}</Text>
-        <Text style={styles.cardSub}>{flashcardsets.subject}</Text>
+        <Text style={[styles.cardTitle, { color: c.text }]}>
+          {flashcardsets.name}
+        </Text>
+        <Text style={[styles.cardSub, { color: c.muted }]}>
+          {flashcardsets.subject}
+        </Text>
       </View>
 
-      <Text style={styles.cardSub}></Text>
+      {/* <Text style={[styles.cardSub, { color: c.muted }]}></Text> */}
     </View>
   );
 }
@@ -71,9 +95,18 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
   },
-  cardMain: {},
-  cardTitle: {},
-  cardSub: {},
+  cardMain: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  cardSub: {
+    fontSize: 12,
+  },
   container: {
     flex: 1,
     alignItems: "center",
@@ -82,7 +115,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "600",
     textAlign: "center",
   },
@@ -101,6 +134,20 @@ const styles = StyleSheet.create({
     gap: 8,
     alignItems: "center",
   },
-  input: {},
-  button: {},
+  input: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  button: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "600",
+  },
 });

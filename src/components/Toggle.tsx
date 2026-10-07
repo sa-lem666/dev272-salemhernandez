@@ -24,7 +24,15 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: "white",
   },
-  toggleOn: {},
-  label: {},
-  labelOn: {},
+  toggleOn: {
+    backgroundColor: "black",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "black",
+  },
+  labelOn: {
+    color: "white",
+  },
 });
