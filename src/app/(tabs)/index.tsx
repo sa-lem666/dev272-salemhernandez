@@ -27,7 +27,7 @@ export default function Index() {
     <FlatList
       data={filtered}
       keyExtractor={(f) => f.id}
-      renderItem={({ item }) => <FlashcardRow flashcardsets={item} c={c} />}
+      renderItem={({ item }) => <FlashcardRow flashcardsets={item} />}
       ListHeaderComponent={
         <Header c={c} query={query} onChangeQuery={setQuery} />
       }

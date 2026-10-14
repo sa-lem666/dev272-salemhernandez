@@ -1,19 +1,28 @@
-import { Palette } from "@/constants/colors";
 import { FlashCardSet } from "@/data/flashcardset";
-import { StyleSheet, Text, View } from "react-native";
+import { usePalette } from "@/hooks/usePalette";
+import { useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export function FlashcardRow({
   flashcardsets,
-  c,
 }: {
   flashcardsets: FlashCardSet;
-  c: Palette;
 }) {
+  const c = usePalette();
+  const router = useRouter();
+
   return (
-    <View
-      style={[
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: "/flashcardsets/[id]",
+          params: { id: flashcardsets.id },
+        })
+      }
+      style={({ pressed }) => [
         styles.card,
         { backgroundColor: c.card, borderColor: c.cardBorder },
+        pressed && styles.pressed,
       ]}
     >
       <View style={styles.cardMain}>
@@ -26,7 +35,7 @@ export function FlashcardRow({
       </View>
 
       {/* <Text style={[styles.cardSub, { color: c.muted }]}></Text> */}
-    </View>
+    </Pressable>
   );
 }
 
@@ -47,5 +56,8 @@ const styles = StyleSheet.create({
   },
   cardSub: {
     fontSize: 12,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });

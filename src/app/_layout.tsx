@@ -1,6 +1,7 @@
 // Root layout. Every screen file inside src/app/ is a route.
 
-import ThemeToggle from "@/components/ThemeToggle";
+import { FavoritesProvider } from "@/context/FavoritesContext";
+import { RecentsProvider } from "@/context/RecentsContext";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
@@ -11,16 +12,21 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={scheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar style="auto" />
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "Flashcard App",
-            headerRight: () => <ThemeToggle />,
-          }}
-        />
-      </Stack>
+      <FavoritesProvider>
+        <RecentsProvider>
+          <StatusBar style="auto" />
+          <Stack>
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                title: "Flashcard App",
+                //headerRight: () => <ThemeToggle />,
+                headerBackButtonDisplayMode: "default",
+              }}
+            />
+          </Stack>
+        </RecentsProvider>
+      </FavoritesProvider>
     </ThemeProvider>
   );
 }

@@ -31,11 +31,15 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="newSet"
+        name="recentSets"
         options={{
-          title: "New Set",
+          title: "Recent Sets",
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="my-library-add" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="archive-clock"
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
