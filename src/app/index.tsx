@@ -1,4 +1,6 @@
-import { FlashCardSet, flashcardsets } from "@/data/flashcardset";
+import { FlashcardRow } from "@/components/FlashcardRow";
+import { colors, Palette } from "@/constants/colors";
+import { flashcardsets } from "@/data/flashcardset";
 import { useState } from "react";
 import {
   FlatList,
@@ -9,26 +11,38 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { colors, Palette } from "./constants/colors";
 
 // This is the home screen (route "/").
 export default function Index() {
+  const [query, setQuery] = useState<string>("");
+  const q = query.trim().toLowerCase();
+  const filtered = flashcardsets.filter(
+    (f) =>
+      f.name.toLowerCase().includes(q) || f.subject.toLowerCase().includes(q),
+  );
+
   const c = colors[useColorScheme() === "dark" ? "dark" : "light"];
 
   return (
     <FlatList
-      data={flashcardsets}
+      data={filtered}
       keyExtractor={(f) => f.id}
       renderItem={({ item }) => <FlashcardRow flashcardsets={item} c={c} />}
-      ListHeaderComponent={<Header c={c} />}
+      ListHeaderComponent={
+        <Header c={c} query={query} onChangeQuery={setQuery} />
+      }
       contentContainerStyle={styles.list}
     />
   );
 }
 
-function Header({ c }: { c: Palette }) {
-  const [query, setQuery] = useState<string>("");
+type HeaderProps = {
+  query: string;
+  onChangeQuery: (query: string) => void;
+  c: Palette;
+};
 
+function Header({ query, onChangeQuery, c }: HeaderProps) {
   return (
     <View style={styles.container}>
       <Text style={[styles.title, { color: c.text }]}>
@@ -37,51 +51,30 @@ function Header({ c }: { c: Palette }) {
 
       <View style={styles.row}>
         <TextInput
-          style={[styles.input, { borderColor: c.border, color: c.text }]}
+          style={[
+            styles.input,
+            {
+              borderColor: c.cardBorder,
+              color: c.text,
+              backgroundColor: c.card,
+            },
+          ]}
           placeholder="Search flashcard library"
           placeholderTextColor={c.muted}
           value={query}
-          onChangeText={setQuery}
+          onChangeText={onChangeQuery}
           autoCapitalize="none"
           returnKeyType="search"
         />
 
         <Pressable
           style={[styles.button, { backgroundColor: c.primary }]}
-          onPress={() => console.log("Search:", query)} //Terminal should show the search action and what was searched
+          onPress={() => onChangeQuery("")}
         >
-          <Text style={styles.buttonText}>Search</Text>
+          <Text style={styles.buttonText}>Clear</Text>
         </Pressable>
       </View>
       <Text style={{ color: c.muted }}>{query.length} characters</Text>
-    </View>
-  );
-}
-
-function FlashcardRow({
-  flashcardsets,
-  c,
-}: {
-  flashcardsets: FlashCardSet;
-  c: Palette;
-}) {
-  return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: c.card, borderColor: c.cardBorder },
-      ]}
-    >
-      <View style={styles.cardMain}>
-        <Text style={[styles.cardTitle, { color: c.text }]}>
-          {flashcardsets.name}
-        </Text>
-        <Text style={[styles.cardSub, { color: c.muted }]}>
-          {flashcardsets.subject}
-        </Text>
-      </View>
-
-      {/* <Text style={[styles.cardSub, { color: c.muted }]}></Text> */}
     </View>
   );
 }

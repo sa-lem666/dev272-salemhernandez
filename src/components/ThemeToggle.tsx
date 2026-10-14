@@ -1,14 +1,14 @@
-import { colors } from "@/app/constants/colors";
+import { colors } from "@/constants/colors";
 
 import {
-    Appearance,
-    Pressable,
-    StyleSheet,
-    Text,
-    useColorScheme,
+  Appearance,
+  Pressable,
+  StyleSheet,
+  Text,
+  useColorScheme,
 } from "react-native";
 
-export default function ThemeToggle() {
+export default function Toggle() {
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
   const c = colors[isDark ? "dark" : "light"];

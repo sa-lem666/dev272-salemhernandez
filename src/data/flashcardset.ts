@@ -1,4 +1,3 @@
-// src/data/places.ts
 export type FlashCardSet = {
   id: string;
   name: string;
@@ -14,5 +13,4 @@ export const flashcardsets: FlashCardSet[] = [
   { id: "6", name: "Country Capitals", subject: "Geography" },
   { id: "7", name: "React Components", subject: "Computer Science" },
   { id: "8", name: "Math Formulas", subject: "Mathematics" },
-  // ...at least 8 for the assignment
 ];
