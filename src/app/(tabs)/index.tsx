@@ -1,6 +1,8 @@
 import { FlashcardRow } from "@/components/FlashcardRow";
 import { colors, Palette } from "@/constants/colors";
-import { flashcardsets } from "@/data/flashcardset";
+import { useFlashcardSets } from "@/context/FlashcardSetsContext";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   FlatList,
@@ -14,6 +16,8 @@ import {
 
 // This is the home screen (route "/").
 export default function Index() {
+  const { flashcardsets } = useFlashcardSets();
+  const router = useRouter();
   const [query, setQuery] = useState<string>("");
   const q = query.trim().toLowerCase();
   const filtered = flashcardsets.filter(
@@ -24,15 +28,29 @@ export default function Index() {
   const c = colors[useColorScheme() === "dark" ? "dark" : "light"];
 
   return (
-    <FlatList
-      data={filtered}
-      keyExtractor={(f) => f.id}
-      renderItem={({ item }) => <FlashcardRow flashcardsets={item} />}
-      ListHeaderComponent={
-        <Header c={c} query={query} onChangeQuery={setQuery} />
-      }
-      contentContainerStyle={styles.list}
-    />
+    <View>
+      <FlatList
+        data={filtered}
+        keyExtractor={(f) => f.id}
+        renderItem={({ item }) => <FlashcardRow flashcardsets={item} />}
+        ListHeaderComponent={
+          <Header c={c} query={query} onChangeQuery={setQuery} />
+        }
+        contentContainerStyle={styles.list}
+      />
+
+      <Pressable
+        onPress={() => router.push("/add")}
+        accessibilityRole="button"
+        accessibilityLabel="Add flashcardset"
+        style={({ pressed }) => [
+          styles.fab,
+          { backgroundColor: c.primary, opacity: pressed ? 0.8 : 1 },
+        ]}
+      >
+        <Ionicons name="add" size={40} color="white" />
+      </Pressable>
+    </View>
   );
 }
 
@@ -142,5 +160,15 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "600",
+  },
+  fab: {
+    position: "absolute",
+    bottom: -100,
+    left: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

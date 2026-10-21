@@ -1,6 +1,7 @@
 // Root layout. Every screen file inside src/app/ is a route.
 
 import { FavoritesProvider } from "@/context/FavoritesContext";
+import { FlashcardSetsProvider } from "@/context/FlashcardSetsContext";
 import { RecentsProvider } from "@/context/RecentsContext";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -12,21 +13,31 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={scheme === "dark" ? DarkTheme : DefaultTheme}>
-      <FavoritesProvider>
-        <RecentsProvider>
-          <StatusBar style="auto" />
-          <Stack>
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                title: "Flashcard App",
-                headerShown: false,
-                headerBackButtonDisplayMode: "default",
-              }}
-            />
-          </Stack>
-        </RecentsProvider>
-      </FavoritesProvider>
+      <FlashcardSetsProvider>
+        <FavoritesProvider>
+          <RecentsProvider>
+            <StatusBar style="auto" />
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="flashcardsets/[id]"
+                options={{
+                  title: "Flashcard App",
+                  headerBackButtonDisplayMode: "minimal",
+                }}
+              />
+              <Stack.Screen
+                name="add"
+                options={{
+                  title: "Add Flashcard Set",
+                  headerShown: false,
+                  headerBackButtonDisplayMode: "minimal",
+                }}
+              />
+            </Stack>
+          </RecentsProvider>
+        </FavoritesProvider>
+      </FlashcardSetsProvider>
     </ThemeProvider>
   );
 }

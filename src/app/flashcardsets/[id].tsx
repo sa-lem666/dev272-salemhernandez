@@ -65,6 +65,14 @@ export default function FlashcardSetDetail() {
           </Text>
         </View>
 
+        {flashcardset.notes ? (
+          <View style={styles.infoRow}>
+            <Text style={[styles.infoText, { color: c.muted }]}>
+              {flashcardset.notes}
+            </Text>
+          </View>
+        ) : null}
+
         <View style={[styles.divider, { backgroundColor: c.cardBorder }]} />
 
         <Pressable

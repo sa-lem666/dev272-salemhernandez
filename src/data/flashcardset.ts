@@ -3,6 +3,7 @@ export type FlashCardSet = {
   name: string;
   subject: string;
   description: string;
+  notes?: string;
 };
 
 export const flashcardsets: FlashCardSet[] = [
