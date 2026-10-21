@@ -1,3 +1,4 @@
+import { useRecents } from "@/context/RecentsContext";
 import { FlashCardSet } from "@/data/flashcardset";
 import { usePalette } from "@/hooks/usePalette";
 import { useRouter } from "expo-router";
@@ -10,15 +11,17 @@ export function FlashcardRow({
 }) {
   const c = usePalette();
   const router = useRouter();
+  const { addRecent } = useRecents();
 
   return (
     <Pressable
-      onPress={() =>
+      onPress={() => {
+        addRecent(flashcardsets.id);
         router.push({
           pathname: "/flashcardsets/[id]",
           params: { id: flashcardsets.id },
-        })
-      }
+        });
+      }}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: c.card, borderColor: c.cardBorder },

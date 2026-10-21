@@ -25,7 +25,7 @@ export default function Favorites() {
       renderItem={({ item }) => <FlashcardRow flashcardsets={item} />}
       ListHeaderComponent={
         <Text style={[styles.title, { color: c.text }]}>
-          Your Favorite Flashcard Sets
+          Your Favorite Sets
         </Text>
       }
       contentContainerStyle={styles.list}

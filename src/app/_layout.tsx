@@ -20,7 +20,7 @@ export default function RootLayout() {
               name="(tabs)"
               options={{
                 title: "Flashcard App",
-                //headerRight: () => <ThemeToggle />,
+                headerShown: false,
                 headerBackButtonDisplayMode: "default",
               }}
             />
