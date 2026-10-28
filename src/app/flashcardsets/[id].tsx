@@ -1,6 +1,7 @@
+import { ErrorView, LoadingView } from "@/components/StatusView";
 import { useFavorites } from "@/context/FavoritesContext";
-import { flashcardsets } from "@/data/flashcardset";
 import { usePalette } from "@/hooks/usePalette";
+import { useSet } from "@/hooks/useSets";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -10,9 +11,14 @@ export default function FlashcardSetDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const c = usePalette();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const flashcardset = flashcardsets.find((f) => f.id === id);
 
-  if (!flashcardset) {
+  const { data: flashcards, isPending, isError, error, refetch } = useSet(id);
+
+  if (isPending) return <LoadingView />;
+  if (isError)
+    return <ErrorView message={error.message} onRetry={() => refetch} />;
+
+  if (!flashcards) {
     return (
       <View style={styles.screen}>
         <Stack.Screen options={{ title: "Not Found" }} />
@@ -29,11 +35,11 @@ export default function FlashcardSetDetail() {
     );
   }
 
-  const favorite = isFavorite(flashcardset.id);
+  const favorite = isFavorite(flashcards.id);
 
   return (
     <View style={styles.screen}>
-      <Stack.Screen options={{ title: flashcardset.name }} />
+      <Stack.Screen options={{ title: flashcards.title }} />
 
       <View
         style={[
@@ -42,18 +48,16 @@ export default function FlashcardSetDetail() {
         ]}
       >
         <View style={[styles.badge, { backgroundColor: c.primary }]}>
-          <Text style={[styles.badgeText]}>{flashcardset.id}</Text>
+          <Text style={[styles.badgeText]}>{flashcards.id}</Text>
         </View>
 
-        <Text style={[styles.name, { color: c.text }]}>
-          {flashcardset.name}
-        </Text>
+        <Text style={[styles.name, { color: c.text }]}>{flashcards.title}</Text>
 
         <View style={styles.infoRow}>
           <MaterialIcons name="subject" size={24} color={c.muted} />
 
           <Text style={[styles.infoText, { color: c.muted }]}>
-            {flashcardset.subject}
+            {flashcards.subject}
           </Text>
         </View>
 
@@ -61,14 +65,14 @@ export default function FlashcardSetDetail() {
           <MaterialIcons name="description" size={24} color={c.muted} />
 
           <Text style={[styles.infoText, { color: c.muted }]}>
-            {flashcardset.description}
+            {flashcards.description}
           </Text>
         </View>
 
-        {flashcardset.notes ? (
+        {flashcards.notes ? (
           <View style={styles.infoRow}>
             <Text style={[styles.infoText, { color: c.muted }]}>
-              {flashcardset.notes}
+              {flashcards.notes}
             </Text>
           </View>
         ) : null}
@@ -76,7 +80,7 @@ export default function FlashcardSetDetail() {
         <View style={[styles.divider, { backgroundColor: c.cardBorder }]} />
 
         <Pressable
-          onPress={() => toggleFavorite(flashcardset.id)}
+          onPress={() => toggleFavorite(flashcards.id)}
           style={({ pressed }) => [
             styles.favButton,
             { borderColor: c.primary, opacity: pressed ? 0.7 : 1 },

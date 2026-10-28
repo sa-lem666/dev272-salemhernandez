@@ -1,5 +1,5 @@
+import { FlashCardSet } from "@/api/sets";
 import { useRecents } from "@/context/RecentsContext";
-import { FlashCardSet } from "@/data/flashcardset";
 import { usePalette } from "@/hooks/usePalette";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -30,7 +30,7 @@ export function FlashcardRow({
     >
       <View style={styles.cardMain}>
         <Text style={[styles.cardTitle, { color: c.text }]}>
-          {flashcardsets.name}
+          {flashcardsets.title}
         </Text>
         <Text style={[styles.cardSub, { color: c.muted }]}>
           {flashcardsets.subject}

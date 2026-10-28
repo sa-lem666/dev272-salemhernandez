@@ -1,8 +1,8 @@
 // Root layout. Every screen file inside src/app/ is a route.
 
 import { FavoritesProvider } from "@/context/FavoritesContext";
-import { FlashcardSetsProvider } from "@/context/FlashcardSetsContext";
 import { RecentsProvider } from "@/context/RecentsContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
@@ -11,9 +11,18 @@ import { useColorScheme } from "react-native";
 export default function RootLayout() {
   const scheme = useColorScheme();
 
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, //1 minute
+        retry: 1,
+      },
+    },
+  });
+
   return (
     <ThemeProvider value={scheme === "dark" ? DarkTheme : DefaultTheme}>
-      <FlashcardSetsProvider>
+      <QueryClientProvider client={queryClient}>
         <FavoritesProvider>
           <RecentsProvider>
             <StatusBar style="auto" />
@@ -37,7 +46,7 @@ export default function RootLayout() {
             </Stack>
           </RecentsProvider>
         </FavoritesProvider>
-      </FlashcardSetsProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

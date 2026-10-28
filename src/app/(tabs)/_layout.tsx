@@ -5,13 +5,17 @@ import { Tabs } from "expo-router";
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ headerRight: () => <ThemeToggle /> }}>
+    <Tabs screenOptions={{ headerRight: ThemeToggle }}>
       <Tabs.Screen
         name="index"
         options={{
           title: "Flashcard Library",
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="my-library-books" color={color} size={size} />
+            <MaterialIcons
+              name="my-library-books"
+              color={String(color)}
+              size={size}
+            />
           ),
         }}
       />
@@ -23,7 +27,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="star-box-multiple"
-              color={color}
+              color={String(color)}
               size={size}
             />
           ),
@@ -37,7 +41,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="archive-clock"
-              color={color}
+              color={String(color)}
               size={size}
             />
           ),

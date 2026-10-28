@@ -1,47 +1,68 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { loadJson, saveJson, STORAGE_KEYS } from "@/lib/storage";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-type RecentsContextValue = {
-  recents: string[]; // ids ordered by most recent first
+type RecentsContextType = {
+  recents: string[];
   addRecent: (id: string) => void;
-  removeRecent: (id: string) => void;
   clearRecents: () => void;
-  isRecent: (id: string) => boolean;
 };
 
-export const RecentsContext = createContext<RecentsContextValue | null>(null);
+const RecentsContext = createContext<RecentsContextType | undefined>(undefined);
 
-const maxRecents = 10; //caps how many are in recents tab
-
-export function RecentsProvider({ children }: { children: ReactNode }) {
+export function RecentsProvider({ children }: { children: React.ReactNode }) {
   const [recents, setRecents] = useState<string[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isInitialMount = useRef(true); // stops weird glitching due to constant refreshing, that was weird to encounter
+
+  useEffect(() => {
+    loadJson<string[]>(STORAGE_KEYS.recents, []).then((savedRecents) => {
+      setRecents(savedRecents);
+      setIsLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    saveJson(STORAGE_KEYS.recents, recents);
+  }, [recents, isLoaded]);
 
   const addRecent = (id: string) => {
     setRecents((current) => {
-      const filteredRecents = current.filter((f) => f !== id);
-      return [id, ...filteredRecents].slice(0, maxRecents);
+      // Prevent redundant state updates if the item is already first in line
+      if (current[0] === id) return current;
+
+      const filtered = current.filter((item) => item !== id);
+      return [id, ...filtered];
     });
-  };
-  const removeRecent = (id: string) => {
-    setRecents((current) => current.filter((f) => f !== id));
   };
 
   const clearRecents = () => {
     setRecents([]);
   };
 
-  const isRecent = (id: string) => recents.includes(id);
-
   return (
-    <RecentsContext.Provider
-      value={{ recents, addRecent, removeRecent, clearRecents, isRecent }}
-    >
+    <RecentsContext.Provider value={{ recents, addRecent, clearRecents }}>
       {children}
     </RecentsContext.Provider>
   );
 }
 
 export function useRecents() {
-  const ctx = useContext(RecentsContext);
-  if (!ctx) throw new Error("useRecents must be used inside RecentsProvider");
-  return ctx;
+  const context = useContext(RecentsContext);
+  if (!context) {
+    throw new Error("useRecents must be used within a RecentsProvider");
+  }
+  return context;
 }

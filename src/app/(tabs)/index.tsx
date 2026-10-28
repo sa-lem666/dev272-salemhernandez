@@ -1,12 +1,14 @@
 import { FlashcardRow } from "@/components/FlashcardRow";
+import { ErrorView, LoadingView } from "@/components/StatusView";
 import { colors, Palette } from "@/constants/colors";
-import { useFlashcardSets } from "@/context/FlashcardSetsContext";
+import { useSets } from "@/hooks/useSets";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   FlatList,
   Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
   TextInput,
@@ -16,16 +18,31 @@ import {
 
 // This is the home screen (route "/").
 export default function Index() {
-  const { flashcardsets } = useFlashcardSets();
+  const c = colors[useColorScheme() === "dark" ? "dark" : "light"];
+
+  const [loading, setLoading] = useState(true);
+
+  const {
+    data: flashcardsets,
+    isPending,
+    isError,
+    error,
+    refetch,
+    isRefetching,
+  } = useSets();
+
   const router = useRouter();
   const [query, setQuery] = useState<string>("");
   const q = query.trim().toLowerCase();
-  const filtered = flashcardsets.filter(
+  const filtered = flashcardsets?.filter(
     (f) =>
-      f.name.toLowerCase().includes(q) || f.subject.toLowerCase().includes(q),
+      f.title?.toLowerCase().includes(q) ||
+      f.subject?.toLowerCase().includes(q),
   );
 
-  const c = colors[useColorScheme() === "dark" ? "dark" : "light"];
+  if (isPending) return <LoadingView />;
+  if (isError)
+    return <ErrorView message={error.message} onRetry={() => refetch} />;
 
   return (
     <View>
@@ -36,9 +53,23 @@ export default function Index() {
         ListHeaderComponent={
           <Header c={c} query={query} onChangeQuery={setQuery} />
         }
+        ListEmptyComponent={
+          <Text>
+            {q
+              ? "No flashcard sets match your search."
+              : "No flashcard sets yet."}
+          </Text>
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={() => {
+              refetch();
+            }}
+          />
+        }
         contentContainerStyle={styles.list}
       />
-
       <Pressable
         onPress={() => router.push("/add")}
         accessibilityRole="button"
@@ -101,6 +132,10 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
     gap: 8,
+  },
+  empty: {
+    textAlign: "center",
+    paddingVertical: 24,
   },
   card: {
     padding: 12,

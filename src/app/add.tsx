@@ -1,6 +1,7 @@
 import { usePalette } from "@/hooks/usePalette";
-import { SetForm, validateSet } from "@/utils/validateSet";
-import { ReactNode, useState } from "react";
+import { DEFAULT_SET_VALUES, SetFormData, setSchema } from "@/utils/setSchema";
+import { ReactNode } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -15,70 +16,47 @@ import {
   View,
 } from "react-native";
 
-import { useFlashcardSets } from "@/context/FlashcardSetsContext";
+import { createSet } from "@/api/sets";
 import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-
-const EMPTY_FORM: SetForm = {
-  name: "",
-  subject: "",
-  description: "",
-  notes: "",
-};
-
-type Touched = Partial<Record<keyof SetForm, boolean>>;
 
 export default function addSet() {
   const router = useRouter();
-  const { saveNewSet } = useFlashcardSets();
   const c = usePalette();
-  const [form, setForm] = useState<SetForm>(EMPTY_FORM);
-  const [touched, setTouched] = useState<Touched>({});
-  const [submitAttempted, setAttemptSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SetFormData>({
+    resolver: zodResolver(setSchema),
+    defaultValues: DEFAULT_SET_VALUES,
+    mode: "onTouched",
+  });
 
-  const handleSubmit = async () => {
-    if (submitting) return;
+  const AddSet = useMutation({
+    mutationFn: createSet,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["flashcards"] });
+      router.back();
+    },
+    onError: (e) => Alert.alert("Could not save", e.message),
+  });
+
+  const onSubmit = (data: SetFormData) => {
     Keyboard.dismiss();
-    setAttemptSubmitted(true);
-    if (Object.keys(errors).length > 0) return;
-
-    setSubmitting(true);
-    setSubmitError(null);
-    try {
-      const saved = await saveNewSet({
-        name: form.name.trim(),
-        subject: form.subject.trim(),
-        description: form.description.trim(),
-        notes: form.notes?.trim(),
-      });
-      Alert.alert("Saved", `${saved.name} was saved.`, [
-        { text: "OK", onPress: () => router.back() },
-      ]);
-    } catch (e) {
-      console.warn("saveSet failed:", e);
-      setSubmitError(
-        "We could not save your flashcard set. Check your connection and try again.",
-      );
-    } finally {
-      setSubmitting(false);
-    }
+    AddSet.mutate({
+      title: data.title.trim(),
+      subject: data.subject.trim(),
+      description: data.description.trim(),
+      notes: data.notes?.trim(),
+    });
   };
 
-  const errors = validateSet(form);
-
-  const touch = (key: keyof SetForm) =>
-    setTouched((current: any) => ({ ...current, [key]: true }));
-
-  const errorFor = (key: keyof SetForm) =>
-    touched[key] || submitAttempted ? errors[key] : undefined;
-
-  const update = <K extends keyof SetForm>(key: K, value: SetForm[K]) =>
-    setForm((current: any) => ({ ...current, [key]: value }));
-
-  const inputStyle = (key: keyof SetForm) => [
+  const inputStyle = [
     styles.input,
     { color: c.text, backgroundColor: c.card, borderColor: c.border },
   ];
@@ -93,78 +71,113 @@ export default function addSet() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <Field label="Name">
-          <TextInput
-            style={inputStyle("name")}
-            value={form.name}
-            onChangeText={(t) => update("name", t)}
-            placeholder="Set Name"
-            placeholderTextColor={c.muted}
-            autoCapitalize="words"
-            returnKeyType="next"
-            accessibilityLabel="Title"
-          />
-        </Field>
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field label="Name" error={errors.title?.message}>
+              <TextInput
+                style={[styles.input, inputStyle]}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Set Name"
+                placeholderTextColor={c.muted}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </Field>
+          )}
+        />
 
-        <Field label="Subject">
-          <TextInput
-            style={inputStyle("subject")}
-            value={form.subject}
-            onChangeText={(t) => update("subject", t)}
-            placeholder="Subject"
-            placeholderTextColor={c.muted}
-            autoCapitalize="words"
-            returnKeyType="next"
-            accessibilityLabel="Subject"
-          />
-        </Field>
+        <Controller
+          control={control}
+          name="subject"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field label="Subject" error={errors.subject?.message}>
+              <TextInput
+                style={[styles.input, inputStyle]}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Subject"
+                placeholderTextColor={c.muted}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </Field>
+          )}
+        />
 
-        <Field label="Description">
-          <TextInput
-            style={inputStyle("description")}
-            value={form.description}
-            onChangeText={(t) => update("description", t)}
-            placeholder="Description"
-            placeholderTextColor={c.muted}
-            autoCapitalize="words"
-            returnKeyType="next"
-            accessibilityLabel="Description"
-          />
-        </Field>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field label="Description" error={errors.description?.message}>
+              <TextInput
+                style={[styles.input, inputStyle]}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Description"
+                placeholderTextColor={c.muted}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </Field>
+          )}
+        />
 
-        <Field label="Notes">
-          <TextInput
-            style={inputStyle("notes")}
-            value={form.notes}
-            onChangeText={(t) => update("notes", t)}
-            placeholder="Notes"
-            placeholderTextColor={c.muted}
-            autoCapitalize="words"
-            returnKeyType="next"
-            accessibilityLabel="Notes"
-          />
-        </Field>
+        <Controller
+          control={control}
+          name="notes"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Field label="Notes" error={errors.notes?.message}>
+              <TextInput
+                style={[styles.input, inputStyle]}
+                value={value ?? ""}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Notes"
+                placeholderTextColor={c.muted}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            </Field>
+          )}
+        />
 
-        {submitError ? (
+        {AddSet.isError ? (
           <View
             style={[styles.banner, { borderColor: "red" }]}
             accessibilityRole="alert"
           >
             <Ionicons name="alert-circle-outline" size={20} color="red" />
             <Text style={[styles.bannerText, { color: "red" }]}>
-              {submitError}
+              We could not save your flashcard set. Check your connection and
+              try again.
             </Text>
           </View>
         ) : null}
 
         <Pressable
-          style={[styles.save, { backgroundColor: c.primary }]}
-          disabled={submitting}
-          onPress={handleSubmit}
+          style={({ pressed }) => [
+            styles.save,
+            {
+              backgroundColor: c.primary,
+              opacity: AddSet.isPending ? 0.6 : pressed ? 0.8 : 1,
+            },
+          ]}
+          disabled={AddSet.isPending}
+          onPress={() => handleSubmit(onSubmit)()}
         >
-          {submitting ? <ActivityIndicator color="#fff" /> : null}
+          {AddSet.isPending ? <ActivityIndicator color="#fff" /> : null}
           <Text style={styles.saveText}>
-            {submitting ? "Saving..." : submitError ? "Try again" : "Save"}
+            {AddSet.isPending
+              ? "Saving..."
+              : AddSet.isError
+                ? "Try again"
+                : "Save"}
           </Text>
         </Pressable>
       </ScrollView>

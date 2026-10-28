@@ -1,23 +1,24 @@
 import { FlashcardRow } from "@/components/FlashcardRow";
+import { ErrorView, LoadingView } from "@/components/StatusView";
 import { useFavorites } from "@/context/FavoritesContext";
-import { flashcardsets } from "@/data/flashcardset";
 import { usePalette } from "@/hooks/usePalette";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useSets } from "@/hooks/useSets";
+import { FlatList, StyleSheet, Text } from "react-native";
 
 export default function Favorites() {
   const c = usePalette();
   const { favorites } = useFavorites();
-  const favoriteFlashcardSets = flashcardsets.filter((f) =>
+
+  const { data: flashcards, isPending, isError, error, refetch } = useSets();
+
+  const favoriteFlashcardSets = flashcards?.filter((f) =>
     favorites.includes(f.id),
   );
 
-  if (favoriteFlashcardSets.length === 0) {
-    return (
-      <View style={styles.empty}>
-        <Text style={{ color: c.muted }}>No favorites yet</Text>
-      </View>
-    );
-  }
+  if (isPending) return <LoadingView />;
+  if (isError)
+    return <ErrorView message={error.message} onRetry={() => refetch} />;
+
   return (
     <FlatList
       data={favoriteFlashcardSets}
