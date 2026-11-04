@@ -42,6 +42,7 @@
     "eslint-config-expo": "~58.0.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.7",
+    "husky": "^9.1.7",
     "jest": "~30.5.2",
     "jest-expo": "~58.0.14",
     "prettier": "^3.9.10",
@@ -60,7 +61,8 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prepare": "husky"
   },
   "private": true,
   "packageManager": "pnpm@12.16.1",
