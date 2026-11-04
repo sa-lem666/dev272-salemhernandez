@@ -198,3 +198,11 @@ insert into public.items (name, notes) values
   ('Fifth item', ''); -->
 
 You also need to create a .env file which should include your supabase url and key. Do NOT commit those things to your repository.
+
+# Scripts
+pnpm install
+pnpm lint
+pnpm format:check
+pnpm exec tsc --noEmit
+pnpm test
+pnpm start
