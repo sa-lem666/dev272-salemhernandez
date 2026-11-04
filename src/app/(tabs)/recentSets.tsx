@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-export default function recentSets() {
+export default function RecentSets() {
   const c = usePalette();
   const { recents } = useRecents();
 

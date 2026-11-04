@@ -22,7 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 
-export default function addSet() {
+export default function AddSet() {
   const router = useRouter();
   const c = usePalette();
   const queryClient = useQueryClient();

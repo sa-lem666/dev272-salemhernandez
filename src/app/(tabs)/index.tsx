@@ -20,7 +20,7 @@ import {
 export default function Index() {
   const c = colors[useColorScheme() === "dark" ? "dark" : "light"];
 
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
 
   const {
     data: flashcardsets,
